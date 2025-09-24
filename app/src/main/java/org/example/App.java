@@ -38,8 +38,8 @@ public class App {
 
 
         String serviceName = "openai-java"; // shows up as the service in SigNoz
-        String tracesEndpoint = "https://ingest.us.signoz.cloud:443/v1/traces"; // OTLP/HTTP traces path
-        String ingestionKey = dotenv.get("SIGNOZ_INGESTION_KEY");
+        // String tracesEndpoint = "https://ingest.us.signoz.cloud:443/v1/traces"; // OTLP/HTTP traces path
+        // String ingestionKey = dotenv.get("SIGNOZ_INGESTION_KEY");
 
         Resource resource = Resource.getDefault()
             .toBuilder()
@@ -47,11 +47,11 @@ public class App {
             .build();
 
 
-        // --- OTLP/HTTP exporter to SigNoz (with auth header) ---
-        OtlpHttpSpanExporter otlpExporter = OtlpHttpSpanExporter.builder()
-                .setEndpoint(tracesEndpoint) // IMPORTANT: includes /v1/traces for HTTP
-                .addHeader("signoz-ingestion-key", ingestionKey)
-                .build();
+        // // --- OTLP/HTTP exporter to SigNoz (with auth header) ---
+        // OtlpHttpSpanExporter otlpExporter = OtlpHttpSpanExporter.builder()
+        //         .setEndpoint(tracesEndpoint) // IMPORTANT: includes /v1/traces for HTTP
+        //         .addHeader("signoz-ingestion-key", ingestionKey)
+        //         .build();
 
 
         LoggingSpanExporter loggingExporter = LoggingSpanExporter.create();
@@ -59,7 +59,7 @@ public class App {
         // --- TracerProvider
         SdkTracerProvider tracerProvider = SdkTracerProvider.builder()
                 .setResource(resource)
-                .addSpanProcessor(BatchSpanProcessor.builder(otlpExporter).build())
+                // .addSpanProcessor(BatchSpanProcessor.builder(otlpExporter).build())
                 .addSpanProcessor(BatchSpanProcessor.builder(loggingExporter).build())
                 .build();
 
@@ -85,7 +85,7 @@ public class App {
             .apiKey(dotenv.get("OPENAI_API_KEY"))
             .build();
 
-         // 3) Wrap it with OpenAITelemetry so calls are traced
+         // Wrap it with OpenAITelemetry so calls are traced
         OpenAIClient otelClient = OpenAITelemetry.builder(openTelemetry)
                 .build()
                 .wrap(client);
